@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+<html>
+  <head>
+    <title>My API Documentation</title>
+    <!-- Load the Swagger UI CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist/swagger-ui.min.css" />
+  </head>
+  <body>
+    <!-- Add a container for the Swagger UI -->
+    <div id="swagger-ui"></div>
+
+    <!-- Load the Swagger UI JavaScript -->
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui.min.js"></script>
+
+    <!-- Create a new Swagger UI instance -->
+    <script>
+      window.onload = function() {
+        const ui = SwaggerUIBundle({
+          url: "openapi-spec.yaml",
+          dom_id: '#swagger-ui',
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIBundle.SwaggerUIStandalonePreset
+          ],
+          layout: "StandaloneLayout"
+        })
+      }
+    </script>
+  </body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def transaction() -> AsyncGenerator[None, None]:
     db: AsyncSession = get_db()
-    """if select was called before than implicit transaction has already started"""
+    # if select was called before than implicit transaction has already started
     if not db.in_transaction():
         async with db.begin():
             logger.debug("explicit transaction begin")

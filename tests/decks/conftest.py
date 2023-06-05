@@ -1,6 +1,7 @@
 import pytest
 
-from app.apps.decks import models, schemas
+from app.schemas import decks_schema
+from app.models import decks_model
 
 
 @pytest.fixture

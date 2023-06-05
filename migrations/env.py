@@ -22,7 +22,7 @@ fileConfig(config.config_file_name)
 from app.config import settings
 from app.db.base import metadata
 # imports below are needed for autogeneration
-from app.apps.decks import models as decks_models
+from app.models import decks_model
 
 # async_fallback=true is used, because alembic works with sync drivers
 config.set_main_option('sqlalchemy.url', str(settings.DB_DSN)+"?async_fallback=true")

@@ -1,52 +1,47 @@
-## Async template on FastAPI and SQLAlchemy 1.4
+# Pronotez Backend
 
-[![GitHub issues](https://img.shields.io/github/issues/lesnik512/fast-api-sqlalchemy-template)](https://github.com/lesnik512/fast-api-sqlalchemy-template/issues)
-[![GitHub forks](https://img.shields.io/github/forks/lesnik512/fast-api-sqlalchemy-template)](https://github.com/lesnik512/fast-api-sqlalchemy-template/network)
-[![GitHub stars](https://img.shields.io/github/stars/lesnik512/fast-api-sqlalchemy-template)](https://github.com/lesnik512/fast-api-sqlalchemy-template/stargazers)
-[![GitHub license](https://img.shields.io/github/license/lesnik512/fast-api-sqlalchemy-template)](https://github.com/lesnik512/fast-api-sqlalchemy-template/blob/main/LICENSE)
-
-### Description
+## Description
 Production-ready dockerized async REST API on FastAPI with SQLAlchemy and PostgreSQL
 
-## Key Features
-- tests on `pytest` with automatic rollback after each test case
+## Pre-requirements
+1. [Taskfile](https://taskfile.dev/): Improved version of Makefile
+2. [Docker](https://www.docker.com/): Containers
+3. [Pyenv](https://github.com/pyenv/pyenv-installer) or [Python 3.8+](https://www.python.org/)
+
+### Available tasks with Taskfile
+```bash
+task -l  # list of tasks with descriptions
+task -a  # list of all tasks
+```
+
+## Setup - Docker
+1. Build docker containers (API and DB)
+   * `task docker-build` or `docker compose build`
+2. Run docker containers
+   * `task docker-up` or `docker compose up -d`
+3. Stop docker containers
+   * `task docker-stop` or `docker compose stop`
+4. Stop and delete containers
+   * `task docker-down` or `docker compose down`
+
+## Setup - Development
+
+### 1. Prepare virtual environment
+#### Using Pyenv (MacOS)
+```bash
+task pyenv-create
+pyenv activate pronotez_api
+```
+#### Or Using venv (Windows)
+```bash
+task venv-create
+task venv-activate
+```
+
+### Features
+- `pytest` with automatic rollback after each test case
 - db session stored in Python's `context variable`
 - configs for `mypy`, `pylint`, `isort` and `black`
 - `Alembic` for DB migrations
+- `Poetry` python package manager
 - CI with Github
-
-### After `git clone` run
-```bash
-task -l  # list of tasks with descriptions
-```
-
-### Prepare virtual environment
-```bash
-python3 -m venv venv
-source venv/bin/activate
-poetry install
-```
-
-# [Poetry](https://python-poetry.org/docs/)
-
-Poetry is python package manager.
-
-Poetry resolve dependencies and conflicts in package and make it fast.
-
-## Basic usage
-
-- `poetry lock` lock dependencies
-- `poetry update` lock, update and install dependencies
-- `poetry install` for install dependencies from pyproject.toml
-- `poetry add <package>` for adding dependency with check on conflicts
-- `poetry remove <package>` for remove
-- `poetry self update` update poetry
-
-# [Task](https://taskfile.dev/)
-
-Task is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make.
-
-## Basic usage
-
-- `task -l` - list of tasks with descriptions
-- `task -a` - list of all tasks

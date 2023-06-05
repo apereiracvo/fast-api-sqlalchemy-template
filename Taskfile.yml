@@ -4,66 +4,116 @@ version: "3"
 dotenv: ["dev.env"]
 
 vars:
-  VENV: venv
+  PYTHON_VERSION: 3.8
+  VENV: pronotez_api
   PYTHON: python3
+  ENV: local
 
 tasks:
-  venv:create:
+  venv-create:
     status:
       - "test -f {{.VENV}}/bin/activate"
     cmds:
       - "python3 -m venv {{.VENV}}"
+      - ". {{.VENV}}/bin/activate"
+      - "python -m pip install --upgrade pip"
+      - "pip install poetry"
+      - "poetry install"
     preconditions:
       - sh: "which poetry"
         msg: "No poetry found"
       - sh: "which {{.PYTHON}}"
         msg: "No {{.PYTHON}} found"
 
-  venv:activate:
+  venv-activate:
     deps:
       - venv:create
     cmds:
       - ". {{.VENV}}/bin/activate"
 
-  containers:up:
+  pyenv-create:
     cmds:
-      - docker-compose up -d db
+      - "pyenv virtualenv {{.PYTHON_VERSION}} {{.VENV}}"
 
-  isort:format:
-    deps:
-      - venv:activate
+  pyenv-setup:
+    cmds:
+      - "python -m pip install --upgrade pip"
+      - "pip install poetry"
+      - "poetry install"
+
+  pyenv-activate:
+    cmds:
+      - "pyenv activate {{.VENV}}"
+
+  pyenv-remove:
+    cmds:
+      - "pyenv virtualenv-delete {{.VENV}}"
+
+  docker-build:
+    desc: "Build docker containers for the configured environment  type (test, prod, local)"
+    cmds:
+      - "docker compose -f ./configs/docker/docker-compose-{{.ENV}}.yml build {{.CLI_ARGS}}"
+
+  docker-up:
+    desc: "Start full app in docker"
+    cmds:
+      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml up -d"
+
+  docker-db-up:
+    desc: "Start DB containers only"
+    cmds:
+      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml up -d db"
+
+  docker-stop:
+    desc: "Stop all containers"
+    cmds:
+      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml stop"
+
+  docker-down:
+    desc: "Down all containers"
+    cmds:
+      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml down --remove-orphans"
+
+  docker-restart:
+    desc: "Restart all containers"
+    cmds:
+      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml restart"
+
+  isort-format:
+#    deps:
+#      - venv:activate
     cmds:
       - "poetry run isort ."
 
-  isort:check:
-    deps:
-      - venv:activate
+  isort-check:
+#    deps:
+#      - venv:activate
     cmds:
       - "poetry run isort --check --diff ."
 
-  black:format:
-    deps:
-      - venv:activate
+  black-format:
+#    deps:
+#      - venv:activate
     cmds:
       - "poetry run black ."
 
-  black:check:
-    deps:
-      - venv:activate
+  black-check:
+#    deps:
+#      - venv:activate
     cmds:
       - "poetry run black --check ."
 
   mypy:
-    deps:
-      - venv:activate
+#    deps:
+#      - venv:activate
     cmds:
       - "poetry run mypy ."
 
   pylint:
-    deps:
-      - venv:activate
+#    deps:
+#      - venv:activate
     cmds:
-      - "poetry run pylint --errors-only app"
+      - "poetry run pylint app"
 
   pytest-docker:
     desc: "run pytest in docker (pass args after '--')"
@@ -73,7 +123,7 @@ tasks:
   pytest:
     desc: "run pytest locally (pass args after '--')"
     deps:
-      - containers:up
+      - docker-db-up
     cmds:
       - alembic downgrade base
       - alembic upgrade head
@@ -85,7 +135,7 @@ tasks:
   migration:
     desc: "create alembic migration (pass args after '--')"
     deps:
-      - containers:up
+      - docker-db-up
     cmds:
       - "alembic revision --autogenerate {{.CLI_ARGS}}"
     env:
@@ -95,7 +145,7 @@ tasks:
   upgrade:
     desc: "apply all alembic migration"
     deps:
-      - containers:up
+      - docker-db-up
     cmds:
     - "alembic upgrade head"
     env:
@@ -105,44 +155,34 @@ tasks:
   downgrade:
     desc: "rollback all alembic migrations"
     deps:
-      - containers:up
+      - docker-db-up
     cmds:
     - "alembic downgrade base"
     env:
       DB_HOST: "localhost"
       TZ: "UTC"
 
-  run-docker:
-    desc: "run app in docker"
-    cmds:
-      - "docker-compose up"
-
   run:
-    desc: "run app"
+    desc: "Run app locally"
     deps:
-      - containers:up
+      - docker-db-up
     cmds:
-      - ./docker-entrypoint.sh start
+      - ./docker-entrypoint.sh api
     env:
       DB_HOST: "localhost"
       TZ: "UTC"
-
-  down:
-    desc: "down all app containers"
-    cmds:
-      - "docker-compose down --remove-orphans"
 
   # groups
   format:
     desc: "run code formatters"
     cmds:
-      - task: isort:format
-      - task: black:format
+      - task: isort-format
+      - task: black-format
 
   lint:
     desc: "run linters"
     cmds:
-      - task: isort:check
-      - task: black:check
+      - task: isort-check
+      - task: black-check
       - task: pylint
       - task: mypy

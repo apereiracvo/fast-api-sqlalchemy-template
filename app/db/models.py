@@ -1,8 +1,10 @@
 import logging
 import re
 from typing import Any, Dict, List, NoReturn, Optional, Tuple, Type, TypeVar
+from uuid import uuid4
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -27,9 +29,9 @@ class EmptyBaseModel(Base):
 class BaseModel(Base):
     __abstract__ = True
 
-    id = sa.Column(sa.Integer, primary_key=True)
-    created_at = sa.Column(sa.DateTime(timezone=True), default=utcnow, nullable=False)
-    updated_at = sa.Column(sa.DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+    id = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    created_date = sa.Column(sa.DateTime(timezone=True), default=utcnow, nullable=False)
+    updated_date = sa.Column(sa.DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     def __str__(self):
         return f"<{type(self).__name__}({self.id=})>"
@@ -55,18 +57,24 @@ class BaseModel(Base):
                 options = []
             options.extend(selectinload(getattr(cls, x)) for x in prefetch)
             query = query.options(*options).execution_options(populate_existing=True)
+        elif options:
+            query = query.options(*options)
         return query
 
     @classmethod
-    async def all(cls: Type[TBase], prefetch: Optional[Tuple[str, ...]] = None) -> List[TBase]:
-        query = cls._get_query(prefetch)
+    async def all(
+        cls: Type[TBase], prefetch: Optional[Tuple[str, ...]] = None, options: Optional[List[Any]] = None
+    ) -> List[TBase]:
+        query = cls._get_query(prefetch, options)
         db = get_db()
         db_execute = await db.execute(query)
         return db_execute.scalars().all()
 
     @classmethod
-    async def get_by_id(cls: Type[TBase], obj_id: int, prefetch: Optional[Tuple[str, ...]] = None) -> Optional[TBase]:
-        query = cls._get_query(prefetch).where(cls.id == obj_id)
+    async def get_by_id(
+        cls: Type[TBase], obj_id: UUID, prefetch: Optional[Tuple[str, ...]] = None, options: Optional[List[Any]] = None
+    ) -> Optional[TBase]:
+        query = cls._get_query(prefetch, options).where(cls.id == str(obj_id))
         db = get_db()
         db_execute = await db.execute(query)
         instance = db_execute.scalars().first()

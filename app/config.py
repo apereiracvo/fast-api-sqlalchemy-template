@@ -1,13 +1,15 @@
+import os.path
+
 from pydantic import BaseSettings
 from sqlalchemy.engine.url import URL
 
 
 class Settings(BaseSettings):
-    SERVICE_NAME: str = "FastApi"
+    SERVICE_NAME: str = "template_backend"
     DEBUG: bool = False
 
     DB_DRIVER: str = "postgresql+asyncpg"
-    DB_HOST: str = "db"
+    DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_USER: str = "postgres"
     DB_PASSWORD: str = "password"

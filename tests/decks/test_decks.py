@@ -2,7 +2,7 @@ import pytest
 from fastapi import status
 from httpx import AsyncClient
 
-from app.apps.decks import models
+from app.models import decks_model
 from tests.decks.conftest import get_deck_data
 
 

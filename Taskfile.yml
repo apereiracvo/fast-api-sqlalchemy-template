@@ -5,7 +5,7 @@ dotenv: ["dev.env"]
 
 vars:
   PYTHON_VERSION: 3.8
-  VENV: pronotez_api
+  VENV: fast-api-template
   PYTHON: python3
   ENV: local
 

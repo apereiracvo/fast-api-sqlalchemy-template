@@ -30,12 +30,18 @@ task -a  # list of all tasks
 #### Using Pyenv (MacOS)
 ```bash
 task pyenv-create
-pyenv activate pronotez_api
+pyenv activate <venv-name>
 ```
 #### Or Using venv (Windows)
 ```bash
 task venv-create
 task venv-activate
+```
+
+### 2. Run API
+```bash
+task run # Run API locally
+task upgrade # Apply migrations to DB
 ```
 
 ### Features

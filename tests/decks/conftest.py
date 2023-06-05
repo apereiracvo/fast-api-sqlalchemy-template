@@ -1,7 +1,7 @@
 import pytest
 
-from app.schemas import decks_schema
 from app.models import decks_model
+from app.schemas import decks_schema
 
 
 @pytest.fixture

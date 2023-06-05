@@ -20,7 +20,7 @@ async def test_get_decks_not_exist(client: AsyncClient):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_get_decks(client: AsyncClient, deck: models.Deck):
+async def test_get_decks(client: AsyncClient, deck: models.DeckModel):
     response = await client.get("/api/decks/")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -29,7 +29,7 @@ async def test_get_decks(client: AsyncClient, deck: models.Deck):
         assert v == getattr(deck, k)
 
 
-async def test_get_deck(client: AsyncClient, deck: models.Deck, card: models.Card):
+async def test_get_deck(client: AsyncClient, deck: models.DeckModel, card: models.CardModel):
     response = await client.get(f"/api/decks/{deck.id}/")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -94,7 +94,7 @@ async def test_post_decks(
 )
 async def test_put_decks(
     client: AsyncClient,
-    deck: models.Deck,
+    deck: models.DeckModel,
     name: str,
     description: str,
     status_code: int,

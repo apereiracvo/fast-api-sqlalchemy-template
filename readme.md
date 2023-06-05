@@ -1,4 +1,4 @@
-# Pronotez Backend
+# FastAPI Template Backend
 
 ## Description
 Production-ready dockerized async REST API on FastAPI with SQLAlchemy and PostgreSQL

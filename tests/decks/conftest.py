@@ -7,7 +7,7 @@ from app.schemas import decks_schema
 @pytest.fixture
 async def deck(db_context):
     deck_data = schemas.DeckCreate(**get_deck_data())
-    deck = models.Deck(**deck_data.dict())
+    deck = models.DeckModel(**deck_data.dict())
     await deck.save()
     return deck
 
@@ -17,15 +17,15 @@ def get_deck_data():
 
 
 @pytest.fixture
-async def card(db_context, deck: models.Deck):
-    instance = models.Card(**card_data.dict(), deck_id=deck.id)
+async def card(db_context, deck: models.DeckModel):
+    instance = models.CardModel(**card_data.dict(), deck_id=deck.id)
     await instance.save()
     return instance
 
 
 @pytest.fixture
-async def another_card(db_context, deck: models.Deck):
-    instance = models.Card(**another_card_data.dict(), deck_id=deck.id)
+async def another_card(db_context, deck: models.DeckModel):
+    instance = models.CardModel(**another_card_data.dict(), deck_id=deck.id)
     await instance.save()
     return instance
 

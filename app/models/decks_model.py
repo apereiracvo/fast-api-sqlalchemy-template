@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from app.db.models import BaseModel
 
 
-class Deck(BaseModel):
+class DeckModel(BaseModel):
     __tablename__ = "deck"
 
     name = sa.Column(sa.String, nullable=False)
@@ -13,7 +13,7 @@ class Deck(BaseModel):
     cards = relationship("Card", lazy="noload")
 
 
-class Card(BaseModel):
+class CardModel(BaseModel):
     __tablename__ = "card"
 
     front = sa.Column(sa.String, nullable=False)

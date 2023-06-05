@@ -9,7 +9,7 @@ from tests.decks.conftest import another_card_data, card_data
 pytestmark = pytest.mark.asyncio
 
 
-async def test_get_cards_empty(client: AsyncClient, deck: models.Deck):
+async def test_get_cards_empty(client: AsyncClient, deck: models.DeckModel):
     response = await client.get(f"/api/decks/{deck.id}/cards/")
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["items"]) == 0
@@ -18,7 +18,7 @@ async def test_get_cards_empty(client: AsyncClient, deck: models.Deck):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_get_cards(client: AsyncClient, card: models.Card):
+async def test_get_cards(client: AsyncClient, card: models.CardModel):
     response = await client.get(f"/api/decks/{card.deck_id}/cards/")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -27,7 +27,7 @@ async def test_get_cards(client: AsyncClient, card: models.Card):
         assert v == getattr(card, k)
 
 
-async def test_get_card(client: AsyncClient, card: models.Card):
+async def test_get_card(client: AsyncClient, card: models.CardModel):
     response = await client.get(f"/api/cards/{card.id}/")
     assert response.status_code == status.HTTP_200_OK
     for k, v in response.json().items():
@@ -35,7 +35,7 @@ async def test_get_card(client: AsyncClient, card: models.Card):
 
 
 @pytest.mark.asyncio
-async def test_create_cards(client: AsyncClient, deck: models.Deck):
+async def test_create_cards(client: AsyncClient, deck: models.DeckModel):
     # bulk create
     response = await client.post(
         f"/api/decks/{deck.id}/cards/",
@@ -68,9 +68,9 @@ async def test_create_cards(client: AsyncClient, deck: models.Deck):
 
 async def test_update_cards(
     client: AsyncClient,
-    deck: models.Deck,
-    card: models.Card,
-    another_card: models.Card,
+    deck: models.DeckModel,
+    card: models.CardModel,
+    another_card: models.CardModel,
 ):
     updated_data = [
         {

@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 0
     DB_ECHO: bool = False
 
+    ROOT: str = os.path.dirname(__file__)
+
     @property
     def DB_DSN(self) -> URL:
         return URL.create(

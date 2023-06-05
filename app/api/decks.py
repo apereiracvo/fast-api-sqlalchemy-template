@@ -4,8 +4,8 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException
 
 from app.db.utils import transaction
-from app.schemas.decks_schema import Deck, Decks, Card, Cards, DeckCreate, CardCreate
 from app.models.decks_model import CardModel, DeckModel
+from app.schemas.decks_schema import Card, CardCreate, Cards, Deck, DeckCreate, Decks
 
 
 router = APIRouter()

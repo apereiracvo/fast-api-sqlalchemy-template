@@ -1,7 +1,3 @@
-import subprocess
-import sys
-
-import spacy
 import uvicorn
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware

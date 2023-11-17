@@ -4,111 +4,13 @@ from typing import List, Tuple
 import openai
 
 from app.config import settings
-from app.services.utils import get_prompt_from_csv
-from app.utils.context_vars import token_count
 
 
 API_TRIES = 5
 BACK_OFF = 10  # Seconds to back-off after retry
 
+
 # region Entry Functions
-
-
-async def generate_section_gpt(
-    section: str,
-    client_info: str,
-    keywords: str,
-    sessions_number: int,
-    text_until_now: str,
-    terminology: str,
-    location_instructions: str = "",
-) -> str:
-    """Generates a specific note section"""
-    SYSTEM_MESSAGES: dict = get_prompt_from_csv(settings.SYSTEM_MESSAGES_PATH)
-
-    PROMPT_TEMPLATES: dict = get_prompt_from_csv(settings.PROMPT_TEMPLATES_PATH)
-
-    GENERAL_MESSAGES: dict = get_prompt_from_csv(settings.GENERAL_MESSAGE_PATH)
-
-    NOTE_STRUCTURE: dict = get_prompt_from_csv(settings.NOTE_STRUCTURE_PATH)
-
-    SECTION_CONTEXTS: dict = get_prompt_from_csv(settings.SECTION_CONTEXTS_PATH)
-
-    USER_FEEDBACK: dict = get_prompt_from_csv(settings.USER_FEEDBACK_PATH)
-
-    TASKS: dict = get_prompt_from_csv(settings.TASKS_PATH)
-
-    WORKFLOW: dict = get_prompt_from_csv(settings.WORKFLOW_PATH)
-
-    # Convert the section name to a valid variable name
-    section_name = section.replace(" ", "_").lower()
-
-    prompt = PROMPT_TEMPLATES["general"]
-    prompt = prompt.replace("{general_message}", GENERAL_MESSAGES["basic"])
-    prompt = prompt.replace("{note_structure}", NOTE_STRUCTURE["basic"])
-    prompt = prompt.replace("{terminology}", terminology)
-    prompt = prompt.replace("{workflow}", WORKFLOW["basic"])
-    prompt = prompt.replace("{client_info}", client_info)
-    prompt = prompt.replace("{keywords}", keywords)
-    prompt = prompt.replace("{text_until_now}", text_until_now)
-    prompt = prompt.replace("{section_context}", SECTION_CONTEXTS[section_name])
-    prompt = prompt.replace("{user_feedback}", USER_FEEDBACK[section_name] + location_instructions)
-    prompt = prompt.replace("{task}", TASKS["generate"])
-
-    # Set the actual section name
-    prompt = prompt.replace("{section}", section)
-    prompt = prompt.replace("{number}", str(sessions_number))
-
-    section_text = await call_gpt_api(SYSTEM_MESSAGES["general"], prompt)
-
-    return section_text
-
-
-async def add_extra_details_gpt(
-    actual_text: str,
-    details: str,
-    client_info: str,
-    keywords: str,
-    sessions_number: int,
-    terminology: str,
-    location_instructions: str = "",
-):
-    """Generates a new intervention with the extra details"""
-    SYSTEM_MESSAGES: dict = get_prompt_from_csv(settings.SYSTEM_MESSAGES_PATH)
-
-    PROMPT_TEMPLATES: dict = get_prompt_from_csv(settings.PROMPT_TEMPLATES_PATH)
-
-    GENERAL_MESSAGES: dict = get_prompt_from_csv(settings.GENERAL_MESSAGE_PATH)
-
-    NOTE_STRUCTURE: dict = get_prompt_from_csv(settings.NOTE_STRUCTURE_PATH)
-
-    SECTION_CONTEXTS: dict = get_prompt_from_csv(settings.SECTION_CONTEXTS_PATH)
-
-    USER_FEEDBACK: dict = get_prompt_from_csv(settings.USER_FEEDBACK_PATH)
-
-    TASKS: dict = get_prompt_from_csv(settings.TASKS_PATH)
-
-    WORKFLOW: dict = get_prompt_from_csv(settings.WORKFLOW_PATH)
-
-    prompt = PROMPT_TEMPLATES["details"]
-    prompt = prompt.replace("{general_message}", GENERAL_MESSAGES["basic"])
-    prompt = prompt.replace("{note_structure}", NOTE_STRUCTURE["basic"])
-    prompt = prompt.replace("{terminology}", terminology)
-    prompt = prompt.replace("{workflow}", WORKFLOW["details"])
-    prompt = prompt.replace("{client_info}", client_info)
-    prompt = prompt.replace("{keywords}", keywords)
-    prompt = prompt.replace("{text}", actual_text)
-    prompt = prompt.replace("{details}", details)
-    prompt = prompt.replace("{context}", SECTION_CONTEXTS["details"])
-    prompt = prompt.replace("{user_feedback}", USER_FEEDBACK["intervention"] + location_instructions)
-    prompt = prompt.replace("{task}", TASKS["details"])
-
-    # Set the actual section name
-    prompt = prompt.replace("{number}", str(sessions_number))
-
-    new_text = await call_gpt_api(SYSTEM_MESSAGES["general"], prompt)
-
-    return new_text
 
 
 async def call_gpt35_turbo(system_message: str, prompt: str) -> Tuple[str, int]:

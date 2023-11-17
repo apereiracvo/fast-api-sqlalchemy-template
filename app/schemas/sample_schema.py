@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List
 from uuid import UUID
 
@@ -10,7 +9,6 @@ class SampleData(Base):
     first_name: str
     last_name: str
     email: str
-    role: AccountRole
     active: bool
 
 

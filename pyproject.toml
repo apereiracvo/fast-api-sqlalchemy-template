@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "fast-api-template"
+name = "sample-api"
 version = "0"
-description = "FastAPI Backend Template"
+description = "Sample FastAPI backend"
 authors = ["Alejandro Pereira <alejandro@axeom.xyz>"]
 license = ""
 
@@ -16,8 +16,12 @@ psycopg2-binary = "*"
 sqlalchemy = "*"
 asyncpg = "*"
 fastapi-camelcase = "^1.0.5"
+openai = "^0.27.6"
 urllib3 = "1.26.15"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
+websockets = "^11.0.3"
+sqlalchemy-utils = "^0.41.1"
+cryptography = "^41.0.2"
 
 
 [tool.poetry.dev-dependencies]

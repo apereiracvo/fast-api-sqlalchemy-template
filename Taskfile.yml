@@ -4,8 +4,9 @@ version: "3"
 dotenv: ["dev.env"]
 
 vars:
+  PROJECT_NAME: Sample
   PYTHON_VERSION: 3.8
-  VENV: fast-api-template
+  VENV: sample_api
   PYTHON: python3
   ENV: local
 
@@ -16,7 +17,7 @@ tasks:
     cmds:
       - "python3 -m venv {{.VENV}}"
       - ". {{.VENV}}/bin/activate"
-      - "python -m pip install --upgrade pip"
+      - "python3 -m pip install --upgrade pip"
       - "pip install poetry"
       - "poetry install"
     preconditions:
@@ -37,7 +38,7 @@ tasks:
 
   pyenv-setup:
     cmds:
-      - "python -m pip install --upgrade pip"
+      - "python3 -m pip install --upgrade pip"
       - "pip install poetry"
       - "poetry install"
 
@@ -52,66 +53,64 @@ tasks:
   docker-build:
     desc: "Build docker containers for the configured environment  type (test, prod, local)"
     cmds:
-      - "docker compose -f ./configs/docker/docker-compose-{{.ENV}}.yml build {{.CLI_ARGS}}"
+      - "docker compose -p {{.PROJECT_NAME}} -f ./configs/docker/docker-compose-{{.ENV}}.yml build {{.CLI_ARGS}}"
 
   docker-up:
     desc: "Start full app in docker"
     cmds:
-      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml up -d"
+      - "docker compose -p {{.PROJECT_NAME}} -f ./configs/docker/docker-compose-{{.ENV}}.yml up -d"
 
   docker-db-up:
     desc: "Start DB containers only"
     cmds:
-      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml up -d db"
+      - "docker compose -p {{.PROJECT_NAME}} -f ./configs/docker/docker-compose-{{.ENV}}.yml up -d db"
+
+  docker-db-backup:
+    desc: "Create a backup file of the current data in the DB"
+    cmds:
+      - "scripts/db_backup.sh"
 
   docker-stop:
     desc: "Stop all containers"
     cmds:
-      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml stop"
+      - "docker compose -p {{.PROJECT_NAME}} -f ./configs/docker/docker-compose-{{.ENV}}.yml stop"
 
   docker-down:
     desc: "Down all containers"
     cmds:
-      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml down --remove-orphans"
+      - "docker compose -p {{.PROJECT_NAME}} -f ./configs/docker/docker-compose-{{.ENV}}.yml down --remove-orphans"
 
   docker-restart:
     desc: "Restart all containers"
     cmds:
-      - "docker-compose -f ./configs/docker/docker-compose-{{.ENV}}.yml restart"
+      - "docker compose -p {{.PROJECT_NAME}} -f ./configs/docker/docker-compose-{{.ENV}}.yml restart"
+
+  docker-clean-logs:
+    desc: "Clear logs of a specific Docker container by name or ID. ex: task docker-clean-logs -- <container-name>"
+    cmds:
+      - ./scripts/bash_task/clean-docker-logs.sh {{.CLI_ARGS}}
 
   isort-format:
-#    deps:
-#      - venv:activate
     cmds:
       - "poetry run isort ."
 
   isort-check:
-#    deps:
-#      - venv:activate
     cmds:
       - "poetry run isort --check --diff ."
 
   black-format:
-#    deps:
-#      - venv:activate
     cmds:
       - "poetry run black ."
 
   black-check:
-#    deps:
-#      - venv:activate
     cmds:
       - "poetry run black --check ."
 
   mypy:
-#    deps:
-#      - venv:activate
     cmds:
       - "poetry run mypy ."
 
   pylint:
-#    deps:
-#      - venv:activate
     cmds:
       - "poetry run pylint app"
 
@@ -128,39 +127,21 @@ tasks:
       - alembic downgrade base
       - alembic upgrade head
       - poetry run pytest -s -vv -x tests/ --cov=app {{.CLI_ARGS}}
-    env:
-      DB_HOST: "localhost"
-      TZ: "UTC"
 
   migration:
     desc: "create alembic migration (pass args after '--')"
-    deps:
-      - docker-db-up
     cmds:
       - "alembic revision --autogenerate {{.CLI_ARGS}}"
-    env:
-      DB_HOST: "localhost"
-      TZ: "UTC"
 
   upgrade:
     desc: "apply all alembic migration"
-    deps:
-      - docker-db-up
     cmds:
     - "alembic upgrade head"
-    env:
-      DB_HOST: "localhost"
-      TZ: "UTC"
 
   downgrade:
     desc: "rollback all alembic migrations"
-    deps:
-      - docker-db-up
     cmds:
     - "alembic downgrade base"
-    env:
-      DB_HOST: "localhost"
-      TZ: "UTC"
 
   run:
     desc: "Run app locally"
@@ -168,9 +149,6 @@ tasks:
       - docker-db-up
     cmds:
       - ./docker-entrypoint.sh api
-    env:
-      DB_HOST: "localhost"
-      TZ: "UTC"
 
   # groups
   format:

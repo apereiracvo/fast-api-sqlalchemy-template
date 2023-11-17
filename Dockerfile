@@ -8,8 +8,7 @@ RUN apt update \
         locales \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir --upgrade pip \
-    poetry
+RUN pip3 install --no-cache-dir --upgrade pip poetry
 
 ENV POETRY_VIRTUALENVS_CREATE=false
 
@@ -25,3 +24,5 @@ COPY . .
 EXPOSE 8000
 
 ENTRYPOINT [ "/code/docker-entrypoint.sh" ]
+
+CMD ["api", "8000"]

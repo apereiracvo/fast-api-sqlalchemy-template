@@ -4,6 +4,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Tuple, Type, TypeVar
 from uuid import uuid4
 
 import sqlalchemy as sa
+from sqlalchemy import desc
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -63,17 +64,26 @@ class BaseModel(Base):
 
     @classmethod
     async def all(
-        cls: Type[TBase], prefetch: Optional[Tuple[str, ...]] = None, options: Optional[List[Any]] = None
+        cls: Type[TBase],
+        prefetch: Optional[Tuple[str, ...]] = None,
+        options: Optional[List[Any]] = None,
+        filters: Optional[List[Any]] = None,
+        order_by: Optional[str] = None,
     ) -> List[TBase]:
         query = cls._get_query(prefetch, options)
         db = get_db()
+        if filters:
+            for filter_condition in filters:
+                query = query.filter(filter_condition)
+        if order_by:
+            query = query.order_by(desc(order_by))
         db_execute = await db.execute(query)
         return db_execute.scalars().all()
 
     @classmethod
     async def get_by_id(
         cls: Type[TBase], obj_id: UUID, prefetch: Optional[Tuple[str, ...]] = None, options: Optional[List[Any]] = None
-    ) -> Optional[TBase]:
+    ) -> TBase:
         query = cls._get_query(prefetch, options).where(cls.id == str(obj_id))
         db = get_db()
         db_execute = await db.execute(query)

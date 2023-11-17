@@ -5,9 +5,12 @@ from sqlalchemy.engine.url import URL
 
 
 class Settings(BaseSettings):
-    SERVICE_NAME: str = "template_backend"
+    # GENERAL CONFIG
+    ROOT_PATH = os.path.dirname(__file__)  # ROOT = /app folder
+    SERVICE_NAME: str = "sample-api"
     DEBUG: bool = False
 
+    # DB CONNECTION CONFIG
     DB_DRIVER: str = "postgresql+asyncpg"
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
@@ -15,11 +18,15 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = "password"
     DB_DATABASE: str = "postgres"
 
+    # DB GENERAL CONFIG
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 0
     DB_ECHO: bool = False
+    DB_AES_ENC_KEY: str = "some-secret-aes"
 
-    ROOT: str = os.path.dirname(__file__)
+    # 3RD PARTY API CONFIGS
+    OPENAI_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
 
     @property
     def DB_DSN(self) -> URL:
@@ -38,3 +45,6 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+print("----ENV DB Settings----")
+print(f"DB_HOST: {settings.DB_HOST}")
+print(f"DB_PORT: {settings.DB_PORT}")

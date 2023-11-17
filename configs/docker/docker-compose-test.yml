@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  app:
+    container_name: sample-api
+    build:
+      context: ../.. # Repo root directory
+      dockerfile: ./Dockerfile
+      args:
+        - ENVIRONMENT=prod
+    restart: always
+    volumes:
+      - ../..:/code
+      - ../envs/test.env:/code/.env
+    ports:
+      - "8000:8000"
+    command:
+      ['start', '8000']
+
+  nginx:
+    container_name: sample-nginx
+    image: nginx
+    volumes:
+        - ../nginx/test-nginx.conf:/etc/nginx/conf.d/default.conf
+        - ../../key.pem:/root/ssl/key.pem
+        - ../../cert.pem:/root/ssl/cert.pem
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app

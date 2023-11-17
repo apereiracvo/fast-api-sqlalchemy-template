@@ -1,4 +1,4 @@
-# FastAPI Template Backend
+# FastAPI Backend
 
 ## Description
 Production-ready dockerized async REST API on FastAPI with SQLAlchemy and PostgreSQL
@@ -29,25 +29,24 @@ task -a  # list of all tasks
 ### 1. Prepare virtual environment
 #### Using Pyenv (MacOS)
 ```bash
-task pyenv-create
-pyenv activate <venv-name>
+task pyenv-create # Create virtualenv with pyenv
+pyenv activate sample_api # Activate virtualenv
+task pyenv-setup # Install dependencies in virtualenv
 ```
 #### Or Using venv (Windows)
 ```bash
 task venv-create
 task venv-activate
 ```
-
-### 2. Run API
+### 2. Run DB and API
+#### a) Spin up and build DB
 ```bash
-task run # Run API locally
-task upgrade # Apply migrations to DB
+task docker-db-up
+task upgrade
 ```
-
-### Features
-- `pytest` with automatic rollback after each test case
-- db session stored in Python's `context variable`
-- configs for `mypy`, `pylint`, `isort` and `black`
-- `Alembic` for DB migrations
-- `Poetry` python package manager
-- CI with Github
+#### b) Run API with Python
+Note: virtualenv must be active
+```bash
+cd app/
+python main.py
+```

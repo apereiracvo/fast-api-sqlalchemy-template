@@ -8,11 +8,11 @@ case "$1" in
         alembic upgrade head
         ;;
     api)
-        exec uvicorn app.main:app --host 0.0.0.0 --port $PORT
+        exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --timeout-keep-alive 3600 --reload --forwarded-allow-ips '*'
         ;;
     start)
         alembic upgrade head
-        uvicorn app.main:app --host 0.0.0.0 --port $PORT --reload
+        uvicorn app.main:app --host 0.0.0.0 --port $PORT --timeout-keep-alive 3600 --reload
         ;;
     tests)
         isort -c --diff --settings-file .isort.cfg .

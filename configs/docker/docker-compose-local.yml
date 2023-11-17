@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  app:
+    container_name: sample-api
+    build:
+      context: ../.. # Repo root directory
+      dockerfile: ./Dockerfile
+      args:
+        - ENVIRONMENT=dev
+    restart: always
+    volumes:
+      - ../..:/code
+      - ../envs/local.env:/code/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_ECHO=true
+    command:
+      ['start', '8000']
+
+  db:
+    container_name: sample-db
+    image: postgres:13
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+
+#  nginx:
+#    container_name: sample-nginx
+#    image: nginx
+#    volumes:
+#        - ../nginx/local-nginx.conf:/etc/nginx/conf.d/default.conf
+#        - ../../key.pem:/root/ssl/key.pem
+#        - ../../cert.pem:/root/ssl/cert.pem
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    depends_on:
+#      - app
+#      - db
